@@ -1,0 +1,15 @@
+{
+    "todos": [
+        {
+            "title": "Cho ni chơi game 🎮",
+            "description": "Mew mew",
+            "due_date": "2025-03-05T18:30",
+            "category": "personal",
+            "priority": "low",
+            "progress": 65,
+            "id": "112d909c-cb70-4199-8bca-0e2bbe18d012",
+            "created_at": "2024-12-30T17:04:18.756131",
+            "completed": false
+        }
+    ]
+}

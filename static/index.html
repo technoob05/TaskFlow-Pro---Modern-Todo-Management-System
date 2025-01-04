@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow Pro | Modern Todo Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <style>
+        /* Color-Coded Categories */
+.category-work { background-color: #d1e7dd; color: #0f5132; }
+.category-personal { background-color: #cfe2ff; color: #1a1a1a; }
+.category-shopping { background-color: #fff3cd; color: #856404; }
+.category-study { background-color: #f8d7da; color: #721c24; }
+.category-other { background-color: #e2e3e5; color: #383d41; }
+
+/* Priority Colors */
+.priority-low { background-color: #d4edda; color: #155724; }
+.priority-medium { background-color: #fff3cd; color: #856404; }
+.priority-high { background-color: #f8d7da; color: #721c24; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .floating-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .floating-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: inherit;
+            animation: pulse-ring 2s infinite;
+            z-index: -1;
+        }
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+        
+        /* Responsive Sidebar */
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+            #sidebar.active {
+                transform: translateX(0);
+            }
+            .overlay {
+                display: none;
+            }
+            .overlay.active {
+                display: block;
+            }
+        }
+        /* Chủ đề màu sắc */
+.default { background-color: white; color: black; }
+.blue { background-color: lightblue; color: navy; }
+.red { background-color: lightcoral; color: darkred; }
+.green { background-color: lightgreen; color: darkgreen; }
+
+/* Kích thước chữ */
+.small { font-size: 12px; }
+.medium { font-size: 16px; }
+.large { font-size: 20px; }
+/* Toggle Switch Styles */
+.toggle-bg {
+    background-color: #ccc;
+    border-radius: 50px;
+    cursor: pointer;
+    position: relative;
+}
+
+.toggle-bg:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50px;
+    transition: background-color 0.2s;
+}
+
+input:checked + .toggle-bg {
+    background-color: #4ade80; /* Green when checked */
+}
+
+input:checked + .toggle-bg .toggle-circle {
+    transform: translateX(100%);
+}
+
+.toggle-circle {
+    top: 1px;
+    left: 1px;
+    transition: transform 0.2s;
+}
+
+
+/* Chế độ tối */
+.dark-mode {
+    background-color: #121212; /* Màu nền tối */
+    color: #e0e0e0; /* Màu chữ sáng */
+}
+
+.dark-mode .glass-morphism {
+    background: rgba(255, 255, 255, 0.1); /* Màu nền trong suốt cho các thẻ glass */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Đường viền sáng hơn */
+}
+
+.dark-mode .toggle-bg {
+    background-color: #4ade80; /* Màu nền toggle khi bật */
+}
+
+.dark-mode .toggle-circle {
+    background-color: #121212; /* Màu toggle circle */
+}
+
+.dark-mode .bg-white {
+    background-color: #1e1e1e; /* Thay đổi màu nền cho các thẻ trắng */
+}
+
+.dark-mode .border-gray-300 {
+    border-color: #444; /* Thay đổi màu viền cho border */
+}
+
+.dark-mode .text-gray-600 {
+    color: #b0b0b0; /* Thay đổi màu chữ cho gray */
+}
+
+.dark-mode .bg-gray-200 {
+    background-color: #333; /* Thay đổi màu nền cho các thẻ gray */
+}
+
+.dark-mode .bg-primary-500 {
+    background-color: #bb86fc; /* Màu chủ đạo cho dark mode */
+}
+
+.dark-mode .bg-green-500 {
+    background-color: #03dac6; /* Màu xanh cho dark mode */
+}
+
+.dark-mode .bg-red-600 {
+    background-color: #cf6679; /* Màu đỏ cho dark mode */
+}
+
+/* Tùy chọn màu sắc cho các thành phần khác */
+.dark-mode .hover\:bg-primary-50:hover {
+    background-color: rgba(187, 135, 249, 0.3); /* Hiệu ứng hover cho dark mode */
+}
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+
+    </script>
+</head>
+
+
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen">
+    
+    <!-- Loading Indicator -->
+<div id="loadingIndicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="loader"></div>
+</div>
+
+
+    <!-- Hamburger Menu Button (Mobile) -->
+    <button id="sidebarToggle" class="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-lg md:hidden">
+        <i class="fas fa-bars text-gray-600"></i>
+    </button>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="overlay fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-64 glass-morphism p-4 transform transition-transform duration-300 ease-in-out z-50" id="sidebar">
+        <!-- Sidebar content remains the same -->
+        <div class="flex items-center space-x-2 mb-8">
+            <i class="fas fa-tasks text-primary-600 text-2xl"></i>
+            <h1 class="text-2xl font-bold text-gray-800">TaskFlow Pro</h1>
+        </div>
+
+        <nav class="space-y-2">
+            <!-- Navigation items remain the same -->
+            <button id="dashboardButton" class="w-full flex items-center space-x-2 p-3 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="fas fa-home text-primary-600"></i>
+                <span>Dashboard</span>
+            </button>
+            
+            <button class="w-full flex items-center space-x-2 p-3 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="fas fa-calendar text-primary-600"></i>
+                <span>Lịch</span>
+            </button>
+            <button id="statsButton" class="w-full flex items-center space-x-2 p-3 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="fas fa-chart-pie text-primary-600"></i>
+                <span>Thống kê</span>
+            </button>
+            
+        <!-- Nút Cài đặt -->
+<button class="w-full flex items-center space-x-2 p-3 rounded-lg hover:bg-primary-50 transition-colors" id="settingsButton">
+    <i class="fas fa-cog text-primary-600"></i>
+    <span>Cài đặt</span>
+</button>
+
+        </nav>
+
+        <!-- Quick Stats remains the same -->
+        <div class="mt-8 space-y-4">
+            <h2 class="text-sm font-semibold text-gray-600 uppercase">Thống kê nhanh</h2>
+            <div class="space-y-2">
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Hoàn thành hôm nay</span>
+                        <span class="text-lg font-bold text-primary-600" id="todayCompleted">0</span>
+                    </div>
+                    <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                        <div class="h-full bg-primary-500 rounded-full" style="width: 70%"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Hiệu suất tuần</span>
+                        <span class="text-lg font-bold text-green-600">85%</span>
+                    </div>
+                    <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                        <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="md:ml-64 p-4 md:p-8 transition-all duration-300">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+                <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Tìm kiếm công việc..."
+                               class="w-full md:w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                        <select id="filterStatus" 
+                                class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="all">Tất cả trạng thái</option>
+                            <option value="active">Đang thực hiện</option>
+                            <option value="completed">Đã hoàn thành</option>
+                        </select>
+                        <select id="sortBy"
+                                class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="dueDate">Sắp xếp theo hạn</option>
+                            <option value="priority">Sắp xếp theo ưu tiên</option>
+                            <option value="created">Sắp xếp theo ngày tạo</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="addNewTask" 
+                        class="w-full md:w-auto px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:from-primary-600 hover:to-primary-700 transition-colors flex items-center justify-center space-x-2">
+                    <i class="fas fa-plus"></i>
+                    <span>Thêm công việc mới</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <!-- Stats cards remain the same but with responsive grid -->
+            <div class="glass-morphism rounded-xl p-6 floating-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Tổng công việc</p>
+                        <h3 class="text-2xl font-bold text-gray-900" id="totalTasks">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-tasks text-primary-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-500">Tuần này</span>
+                        <span class="ml-2 text-sm text-green-600">+12.5%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-morphism rounded-xl p-6 floating-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Đang thực hiện</p>
+                        <h3 class="text-2xl font-bold text-yellow-600" id="activeTasks">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-spinner text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-yellow-600 h-2 rounded-full" style="width: 45%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-morphism rounded-xl p-6 floating-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Đã hoàn thành</p>
+                        <h3 class="text-2xl font-bold text-green-600" id="completedTasks">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check text-green-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-morphism rounded-xl p-6 floating-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Quá hạn</p>
+                        <h3 class="text-2xl font-bold text-red-600" id="overdueTasks">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-red-600 h-2 rounded-full" style="width: 15%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Todo List -->
+        <div id="todoList" class="space-y-4 custom-scrollbar" style="max-height: calc(100vh - 400px); overflow-y: auto;">
+            <!-- Todo items will be dynamically added here -->
+        </div>
+
+        <!-- Todo Template -->
+        <template id="todoTemplate">
+            <div class="todo-item glass-morphism rounded-xl p-4 md:p-6 floating-card animate__animated animate__fadeIn">
+                <div class="flex flex-col md:flex-row md:items-start justify-between space-y-4 md:space-y-0">
+                    <div class="flex items-start space-x-4 flex-1">
+                        <input type="checkbox" 
+                               class="todo-checkbox w-5 h-5 mt-1 rounded border-2 border-gray-300 
+                                      checked:bg-primary-500 checked:border-primary-500 
+                                      transition-colors cursor-pointer z-10 focus:ring-2 
+                                      focus:ring-primary-400 focus:ring-offset-2">
+                        
+                        <div class="flex-1 min-w-0">
+                            <h3 class="todo-title text-lg font-semibold mb-1 break-words"></h3>
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <span class="todo-category px-3 py-1 rounded-full text-xs font-medium"></span>
+                                <span class="todo-priority px-3 py-1 rounded-full text-xs font-medium"></span>
+                                <span class="todo-created-at text-xs text-gray-500"></span>
+                            </div>
+                            <p class="todo-description text-gray-600 text-sm break-words"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <button class="edit-btn p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+                        <div class="flex items-center space-x-2">
+                            <i class="far fa-clock text-gray-400"></i>
+                            <span class="todo-due-date text-sm text-gray-500"></span>
+                        </div>
+                        <div class="flex items-center space-x-2 w-full sm:w-auto">
+                            <span class="text-sm text-gray-500">Tiến độ:</span>
+                            <div class="w-full sm:w-48 bg-gray-200 rounded-full h-2">
+                                <div class="progress-bar h-2 rounded-full bg-primary-500 transition-all duration-300"></div>
+                            </div>
+                            <span class="progress-text text-sm text-gray-600 min-w-[3rem] text-right">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+      <!-- Modal Thêm/Chỉnh sửa công việc -->
+<div id="taskModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl transform transition-all duration-300 scale-95 opacity-100 mx-4" id="modalContent">
+        <div class="p-4 md:p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800" id="modalTitle">Thêm công việc mới</h2>
+                <button id="closeModal" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <i class="fas fa-times text-gray-500"></i>
+                </button>
+            </div>
+            <form id="taskForm" class="space-y-6">
+                <input type="hidden" id="taskId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+                        <input type="text" id="taskTitle" required
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Danh mục</label>
+                        <select id="taskCategory" 
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="work">Công việc</option>
+                            <option value="personal">Cá nhân</option>
+                            <option value="shopping">Mua sắm</option>
+                            <option value="study">Học tập</option>
+                            <option value="other">Khác</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                    <textarea id="taskDescription" rows="3"
+                              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Thời hạn</label>
+                        <input type="datetime-local" id="taskDueDate" required
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Độ ưu tiên</label>
+                        <select id="taskPriority"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="low">Thấp</option>
+                            <option value="medium">Trung bình</option>
+                            <option value="high">Cao</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tiến độ</label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" id="taskProgress" min="0" max="100" step="5"
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <span id="progressValue" class="text-sm text-gray-600 min-w-[3rem]">0%</span>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                    <button type="button" id="cancelTask"
+                            class="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        Hủy
+                    </button>
+                    <button type="submit"
+                            class="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:from-primary-600 hover:to-primary-700 transition-colors">
+                        Lưu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+        <!-- Buttons to open Login and Register Modals -->
+    <div class="flex justify-end p-4">
+        <button id="openLoginModal" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Đăng Nhập</button>
+        <button id="openRegisterModal" class="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg">Đăng Ký</button>
+    </div>
+
+<!-- Modal for Login -->
+<div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6">
+        <h2 class="text-2xl font-bold text-center mb-6">Đăng Nhập</h2>
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" placeholder="Nhập email" id="loginEmail">
+                <p id="loginEmailError" class="text-red-500 text-xs hidden">Vui lòng nhập email hợp lệ.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Mật Khẩu</label>
+                <input type="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" placeholder="Nhập mật khẩu" id="loginPassword">
+                <p id="loginPasswordError" class="text-red-500 text-xs hidden">Vui lòng nhập mật khẩu.</p>
+            </div>
+            <div class="flex justify-between items-center">
+                <div>
+                    <input type="checkbox" id="rememberMe" class="mr-2">
+                    <label for="rememberMe" class="text-sm text-gray-600">Ghi nhớ tôi</label>
+                </div>
+                <a href="#" class="text-sm text-blue-500 hover:underline">Quên mật khẩu?</a>
+            </div>
+            <div class="flex justify-center">
+                <button type="submit" class="w-full mt-4 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200">Đăng Nhập</button>
+            </div>
+        </form>
+        <p class="text-center text-sm text-gray-600 mt-4">Chưa có tài khoản? <a href="#" id="openRegisterModal" class="text-blue-500 hover:underline">Đăng Ký</a></p>
+    </div>
+</div>
+
+<!-- Modal for Registration -->
+<div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6">
+        <h2 class="text-2xl font-bold text-center mb-6">Đăng Ký</h2>
+        <form id="registerForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" placeholder="Nhập email" id="registerEmail">
+                <p id="registerEmailError" class="text-red-500 text-xs hidden">Vui lòng nhập email hợp lệ.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Mật Khẩu</label>
+                <input type="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" placeholder="Nhập mật khẩu" id="registerPassword">
+                <p id="registerPasswordError" class="text-red-500 text-xs hidden">Vui lòng nhập mật khẩu.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Xác Nhận Mật Khẩu</label>
+                <input type="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" placeholder="Nhập lại mật khẩu" id="confirmPassword">
+                <p id="confirmPasswordError" class="text-red-500 text-xs hidden">Mật khẩu không khớp.</p>
+            </div>
+            <div class="flex justify-center">
+                <button type="submit" class="w-full mt-4 px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200">Đăng Ký</button>
+            </div>
+        </form>
+        <p class="text-center text-sm text-gray-600 mt-4">Đã có tài khoản? <a href="#" id="openLoginModal" class="text-blue-500 hover:underline">Đăng Nhập</a></p>
+    </div>
+</div>
+<!-- Modal Cài đặt -->
+<div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-6">
+        <h2 class="text-2xl font-bold text-center mb-6">Cài Đặt</h2>
+        
+        <!-- Tùy chọn chế độ tối -->
+        <div class="mb-4 flex items-center justify-between">
+            <span class="text-gray-700">Chế độ tối</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="darkModeToggle" class="sr-only">
+                <div class="toggle-bg w-11 h-6 bg-gray-300 rounded-full"></div>
+                <div class="toggle-circle absolute w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></div>
+            </label>
+        </div>
+
+        <!-- Tùy chọn chủ đề màu sắc -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Chủ đề màu sắc</label>
+            <select id="themeSelect" class="w-full p-2 border border-gray-300 rounded">
+                <option value="default">Mặc định</option>
+                <option value="blue">Xanh</option>
+                <option value="red">Đỏ</option>
+                <option value="green">Xanh lá</option>
+            </select>
+        </div>
+
+        <!-- Tùy chọn kích thước chữ -->
+        <div class="mb-4">
+            <label class="block text-gray-700">Kích thước chữ</label>
+            <select id="fontSizeSelect" class="w-full p-2 border border-gray-300 rounded">
+                <option value="small">Nhỏ</option>
+                <option value="medium" selected>Vừa</option>
+                <option value="large">Lớn</option>
+            </select>
+        </div>
+
+        <div class="flex justify-center">
+            <button id="closeSettingsModal" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Đóng</button>
+        </div>
+    </div>
+</div>
+<!-- Modal Thống Kê -->
+<div id="statsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6">
+        <h2 class="text-2xl font-bold text-center mb-4">Thống Kê Công Việc</h2>
+        <canvas id="statsChart" class="mb-4"></canvas>
+        <div class="flex justify-end">
+            <button id="closeStatsModal" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Đóng</button>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Footer -->
+        <footer class="mt-8 p-4 text-center text-gray-500 text-sm">
+            <p>© 2024 TaskFlow Pro. Thiết kế bởi [Tên của bạn]</p>
+        </footer>
+    </div>
+
+    <script>
+        // Add event listeners for mobile sidebar
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        });
+
+        document.getElementById('overlay').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        });
+
+        // Close sidebar on window resize if it's open (prevents sidebar from staying open when switching to desktop view)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) { // 768px is the md breakpoint in Tailwind
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('overlay').classList.remove('active');
+            }
+        });
+       // Mở modal đăng nhập
+       document.getElementById('openLoginModal').onclick = function() {
+        document.getElementById('loginModal').classList.remove('hidden');
+    };
+
+    // Mở modal đăng ký
+    document.getElementById('openRegisterModal').onclick = function() {
+        document.getElementById('registerModal').classList.remove('hidden');
+    };
+
+    // Đóng modal khi nhấp bên ngoài
+    window.onclick = function(event) {
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        
+        if (event.target === loginModal) {
+            loginModal.classList.add('hidden');
+        }
+        if (event.target === registerModal) {
+            registerModal.classList.add('hidden');
+        }
+    };
+
+     
+
+        // Handle form submissions (Add your logic here)
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Add login logic here
+            console.log("Login submitted");
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Add registration logic here
+            console.log("Registration submitted");
+        });
+    </script>
+    <script>
+        // Mở modal cài đặt
+        document.getElementById('settingsButton').addEventListener('click', () => {
+            document.getElementById('settingsModal').classList.remove('hidden');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            darkModeToggle.checked = document.body.classList.contains('dark-mode');
+    
+            // Khôi phục trạng thái chủ đề và kích thước chữ
+            const themeSelect = document.getElementById('themeSelect');
+            const fontSizeSelect = document.getElementById('fontSizeSelect');
+            
+            themeSelect.value = localStorage.getItem('theme') || 'default';
+            fontSizeSelect.value = localStorage.getItem('fontSize') || 'medium';
+        });
+    
+        // Đóng modal cài đặt
+        document.getElementById('closeSettingsModal').addEventListener('click', () => {
+            document.getElementById('settingsModal').classList.add('hidden');
+        });
+    
+        // Toggle Dark Mode
+       // Toggle Dark Mode
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+
+            // Hiển thị thông báo
+            Toastify({
+                text: isDarkMode ? "Chế độ tối đã được bật!" : "Chế độ sáng đã được bật!",
+                duration: 3000,
+                gravity: "top",
+                position: 'right',
+                backgroundColor: isDarkMode ? "#4ade80" : "#f87171",
+            }).showToast();
+        });
+
+    
+        // Thay đổi chủ đề màu sắc
+        const themeSelect = document.getElementById('themeSelect');
+        themeSelect.addEventListener('change', () => {
+            const selectedTheme = themeSelect.value;
+            document.body.className = ''; // Xóa tất cả các lớp
+            document.body.classList.add(selectedTheme); // Thêm lớp chủ đề đã chọn
+            localStorage.setItem('theme', selectedTheme);
+        });
+    
+        // Thay đổi kích thước chữ
+        const fontSizeSelect = document.getElementById('fontSizeSelect');
+        fontSizeSelect.addEventListener('change', () => {
+            const selectedFontSize = fontSizeSelect.value;
+            document.body.className = ''; // Xóa tất cả các lớp
+            document.body.classList.add(selectedFontSize); // Thêm lớp kích thước chữ đã chọn
+            localStorage.setItem('fontSize', selectedFontSize);
+        });
+    
+        // Kiểm tra trạng thái dark mode và chủ đề khi tải trang
+        window.addEventListener('load', () => {
+            const darkModeStatus = localStorage.getItem('darkMode');
+            if (darkModeStatus === 'enabled') {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.checked = true;
+            }
+
+            const theme = localStorage.getItem('theme') || 'default';
+            document.body.classList.add(theme);
+
+            const fontSize = localStorage.getItem('fontSize') || 'medium';
+            document.body.classList.add(fontSize);
+        });
+
+        
+    </script>
+    <script>// Mở modal thống kê và vẽ biểu đồ
+       // Mở modal thống kê và vẽ biểu đồ
+document.getElementById('statsButton').addEventListener('click', async () => {
+    document.getElementById('statsModal').classList.remove('hidden');
+    await renderStatsChart(); // Gọi hàm vẽ biểu đồ
+});
+
+// Đóng modal thống kê
+document.getElementById('closeStatsModal').addEventListener('click', () => {
+    document.getElementById('statsModal').classList.add('hidden');
+});
+async function renderStatsChart() {
+    try {
+        const response = await api.fetchStats(); // Fetch your stats
+        console.log(response); // Log the response to check its structure
+
+        // Check if response has the expected properties
+        if (!response || typeof response !== 'object' || !('total' in response)) {
+            throw new Error("Invalid response structure");
+        }
+
+        // Extract statistics directly from the response
+        const total = response.total || 0;
+        const completed = response.completed || 0;
+        const active = response.active || 0;
+        const overdue = response.overdue || 0;
+
+        const ctx = document.getElementById('statsChart').getContext('2d');
+
+        // Destroy the old chart if it exists
+        if (window.statsChart instanceof Chart) {
+            window.statsChart.destroy();
+        }
+
+        // Create a new chart
+        window.statsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Tổng', 'Hoàn thành', 'Đang thực hiện', 'Quá hạn'],
+                datasets: [{
+                    label: 'Số lượng công việc',
+                    data: [total, completed, active, overdue],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(255, 99, 132, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error rendering stats chart:', error);
+        Toastify({
+            text: "Lỗi khi tải dữ liệu thống kê!",
+            duration: 3000,
+            gravity: "top",
+            position: 'right',
+            background: "#ff5f6d",
+        }).showToast();
+    }
+}
+
+// Navigate to the Dashboard
+document.getElementById('dashboardButton').addEventListener('click', () => {
+    window.location.href = '/'; // Change this to your main page URL if different
+});
+
+
+        
+        </script> 
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

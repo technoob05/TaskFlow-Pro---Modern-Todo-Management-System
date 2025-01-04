@@ -1,0 +1,38 @@
+{
+    "todos": [
+        {
+            "title": "fasdf",
+            "description": "dsfasdfsafasf",
+            "due_date": "2299-12-12T12:12",
+            "category": "work",
+            "priority": "low",
+            "progress": 100,
+            "id": "2cadd5e1-5045-4fd7-93a3-e2833bbb047b",
+            "created_at": "2024-12-29T23:35:43.511278",
+            "completed": true,
+            "updated_at": "2024-12-30T00:53:43.573771"
+        },
+        {
+            "title": "ZiMin",
+            "description": "Helutin là đi ",
+            "due_date": "2025-12-12T12:12",
+            "category": "shopping",
+            "priority": "high",
+            "progress": 60,
+            "id": "15d7939b-c9fe-46a5-97b4-6a16b5512cbd",
+            "created_at": "2024-12-30T16:54:37.999863",
+            "completed": false
+        },
+        {
+            "title": "Cho ni chơi game 🎮",
+            "description": "Mew mew",
+            "due_date": "2025-03-05T18:30",
+            "category": "personal",
+            "priority": "low",
+            "progress": 65,
+            "id": "112d909c-cb70-4199-8bca-0e2bbe18d012",
+            "created_at": "2024-12-30T17:04:18.756131",
+            "completed": false
+        }
+    ]
+}

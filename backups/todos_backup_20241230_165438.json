@@ -1,0 +1,39 @@
+{
+    "todos": [
+        {
+            "title": "fasdf",
+            "description": "dsfasdfsafasf",
+            "due_date": "2299-12-12T12:12",
+            "category": "work",
+            "priority": "low",
+            "progress": 100,
+            "id": "2cadd5e1-5045-4fd7-93a3-e2833bbb047b",
+            "created_at": "2024-12-29T23:35:43.511278",
+            "completed": true,
+            "updated_at": "2024-12-30T00:53:43.573771"
+        },
+        {
+            "title": "asdfasf",
+            "description": "dsafasdf",
+            "due_date": "2222-12-12T12:12",
+            "category": "work",
+            "priority": "medium",
+            "progress": 100,
+            "id": "83170dd5-8a1d-4f27-a4fe-6d3da75e3759",
+            "created_at": "2024-12-29T23:36:08.617329",
+            "completed": true,
+            "updated_at": "2024-12-30T00:53:41.918257"
+        },
+        {
+            "title": "sfgas",
+            "description": "asdfsa",
+            "due_date": "2005-12-12T12:12",
+            "category": "work",
+            "priority": "medium",
+            "progress": 85,
+            "id": "4e88ba21-1f14-413c-9d54-b3992b75405c",
+            "created_at": "2024-12-30T01:02:48.533833",
+            "completed": false
+        }
+    ]
+}
